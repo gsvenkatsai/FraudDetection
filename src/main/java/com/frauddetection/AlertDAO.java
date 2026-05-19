@@ -31,7 +31,8 @@ public class AlertDAO {
                             rs.getInt("user_id"),
                             rs.getString("alert_type"),
                             rs.getTimestamp("alert_time"),
-                            rs.getString("severity")
+                            rs.getString("severity"),
+                            rs.getString("description")
                     ));
                 }
             }
@@ -61,7 +62,7 @@ public class AlertDAO {
     }
 
     public void insertAlert(Alert alert) {
-        String query = "INSERT INTO Alerts (user_id, alert_type, alert_time, severity) VALUES (?, ?, ?, ?)";
+        String query = "INSERT INTO Alerts (user_id, alert_type, alert_time, severity, description) VALUES (?, ?, ?, ?, ?)";
 
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(query)) {
@@ -70,6 +71,7 @@ public class AlertDAO {
             pstmt.setString(2, alert.getAlertType());
             pstmt.setTimestamp(3, alert.getAlertTime());
             pstmt.setString(4, alert.getSeverity());
+            pstmt.setString(5, alert.getDescription());
             pstmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();

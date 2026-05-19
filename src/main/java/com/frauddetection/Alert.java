@@ -8,13 +8,15 @@ public class Alert {
     private String alertType;
     private Timestamp alertTime;
     private String severity;
+    private String description;
 
-    public Alert(int alertId, int userId, String alertType, Timestamp alertTime, String severity) {
+    public Alert(int alertId, int userId, String alertType, Timestamp alertTime, String severity, String description) {
         this.alertId = alertId;
         this.userId = userId;
         this.alertType = alertType;
         this.alertTime = alertTime;
         this.severity = severity;
+        this.description = description;
     }
 
     public int getAlertId() { return alertId; }
@@ -22,4 +24,5 @@ public class Alert {
     public String getAlertType() { return alertType; }
     public Timestamp getAlertTime() { return alertTime; }
     public String getSeverity() { return severity; }
+    public String getDescription() { return description; }
 }

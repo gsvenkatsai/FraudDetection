@@ -174,7 +174,7 @@ public class FraudDetectionApp extends JFrame {
 
     private JPanel createUsersPanel() {
         JPanel panel = new JPanel(new BorderLayout());
-        String[] columnNames = {"ID", "Signup Date", "Country", "Status"};
+        String[] columnNames = {"ID", "Full Name", "Signup Date", "Country", "Status"};
         userModel = new DefaultTableModel(columnNames, 0);
         JTable table = new JTable(userModel);
 
@@ -194,7 +194,8 @@ public class FraudDetectionApp extends JFrame {
         List<User> users = userDAO.getAllUsers();
         for (User u : users) {
             model.addRow(new Object[]{
-                    u.getUserId(), u.getSignupDate(), u.getCountry(), u.getStatus()
+                    u.getUserId(), u.getFullName(), u.getSignupDate(),
+                    u.getCountry(), u.getStatus()
             });
         }
     }
@@ -211,7 +212,7 @@ public class FraudDetectionApp extends JFrame {
         
         panel.add(filterPanel, BorderLayout.NORTH);
 
-        String[] columnNames = {"ID", "User ID", "Type", "Time", "Severity"};
+        String[] columnNames = {"ID", "User ID", "Type", "Time", "Severity", "Description"};
         alertModel = new DefaultTableModel(columnNames, 0) {
             @Override
             public boolean isCellEditable(int row, int column) { return false; }
@@ -256,7 +257,7 @@ public class FraudDetectionApp extends JFrame {
         for (Alert a : alerts) {
             model.addRow(new Object[]{
                     a.getAlertId(), a.getUserId(), a.getAlertType(),
-                    a.getAlertTime(), a.getSeverity()
+                    a.getAlertTime(), a.getSeverity(), a.getDescription()
             });
         }
     }

@@ -11,8 +11,9 @@ A SQL-driven fraud detection analytics system built with Java, JDBC, PostgreSQL,
 
 ## Features
 - 6 fraud detection rules using Window Functions and CTEs
-- Real-time alert dashboard
-- Color-coded severity levels (High/Medium/Low)
+- Real-time alert dashboard with color-coded severity levels (High/Medium/Low)
+- Context-rich alert descriptions (e.g. detailed calculations of spending averages or exact travel durations)
+- Rich User details including name mapping from the database
 - DAO pattern for clean separation of concerns
 
 ## Fraud Detection Rules

@@ -19,6 +19,7 @@ public class UserDAO {
             while (rs.next()) {
                 users.add(new User(
                         rs.getInt("user_id"),
+                        rs.getString("full_name"),
                         rs.getTimestamp("signup_date"),
                         rs.getString("country"),
                         rs.getString("status")

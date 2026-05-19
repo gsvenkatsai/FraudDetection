@@ -50,7 +50,8 @@ CREATE TABLE Alerts (
     user_id INT REFERENCES Users(user_id),
     alert_type VARCHAR(50),
     alert_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    severity VARCHAR(10)
+    severity VARCHAR(10),
+    description VARCHAR(255)
 );
 
 -- Indexes
