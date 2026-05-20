@@ -22,6 +22,7 @@ public class FraudDetectionApp extends JFrame {
     private DefaultTableModel userModel;
     private DefaultTableModel alertModel;
     private JComboBox<String> severityFilter;
+    private JTextArea alertDetailsArea;
 
     public FraudDetectionApp() {
         setTitle("Fraud Detection System");
@@ -153,11 +154,50 @@ public class FraudDetectionApp extends JFrame {
         JButton refreshBtn = new JButton("Refresh");
         refreshBtn.addActionListener(e -> refreshTransactions(transactionModel));
 
+        JButton addTransactionBtn = new JButton("Add Transaction");
+        addTransactionBtn.addActionListener(e -> showAddTransactionDialog());
+
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        buttonPanel.add(addTransactionBtn);
+        buttonPanel.add(refreshBtn);
+
         panel.add(new JScrollPane(table), BorderLayout.CENTER);
-        panel.add(refreshBtn, BorderLayout.SOUTH);
+        panel.add(buttonPanel, BorderLayout.SOUTH);
 
         refreshTransactions(transactionModel);
         return panel;
+    }
+
+    private void showAddTransactionDialog() {
+        JTextField userIdField = new JTextField();
+        JTextField amountField = new JTextField();
+        JTextField merchantField = new JTextField();
+        JComboBox<String> statusField = new JComboBox<>(new String[]{"completed", "pending", "failed"});
+
+        Object[] message = {
+                "User ID:", userIdField,
+                "Amount:", amountField,
+                "Merchant:", merchantField,
+                "Status:", statusField
+        };
+
+        int option = JOptionPane.showConfirmDialog(this, message, "Add Transaction", JOptionPane.OK_CANCEL_OPTION);
+        if (option == JOptionPane.OK_OPTION) {
+            try {
+                Transaction newTx = new Transaction(
+                        0,
+                        Integer.parseInt(userIdField.getText()),
+                        new java.math.BigDecimal(amountField.getText()),
+                        new java.sql.Timestamp(System.currentTimeMillis()),
+                        merchantField.getText(),
+                        (String) statusField.getSelectedItem()
+                );
+                transactionDAO.insertTransaction(newTx);
+                refreshTransactions(transactionModel);
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(this, "Invalid input. Please check numeric fields.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
     }
 
     private void refreshTransactions(DefaultTableModel model) {
@@ -181,11 +221,37 @@ public class FraudDetectionApp extends JFrame {
         JButton refreshBtn = new JButton("Refresh");
         refreshBtn.addActionListener(e -> refreshUsers(userModel));
 
+        JButton addUserBtn = new JButton("Add User");
+        addUserBtn.addActionListener(e -> showAddUserDialog());
+
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        buttonPanel.add(addUserBtn);
+        buttonPanel.add(refreshBtn);
+
         panel.add(new JScrollPane(table), BorderLayout.CENTER);
-        panel.add(refreshBtn, BorderLayout.SOUTH);
+        panel.add(buttonPanel, BorderLayout.SOUTH);
 
         refreshUsers(userModel);
         return panel;
+    }
+
+    private void showAddUserDialog() {
+        JTextField nameField = new JTextField();
+        JTextField countryField = new JTextField();
+        JComboBox<String> statusField = new JComboBox<>(new String[]{"active", "suspended", "under_review"});
+
+        Object[] message = {
+                "Full Name:", nameField,
+                "Country:", countryField,
+                "Status:", statusField
+        };
+
+        int option = JOptionPane.showConfirmDialog(this, message, "Add User", JOptionPane.OK_CANCEL_OPTION);
+        if (option == JOptionPane.OK_OPTION) {
+            User newUser = new User(0, nameField.getText(), new java.sql.Timestamp(System.currentTimeMillis()), countryField.getText(), (String) statusField.getSelectedItem());
+            userDAO.insertUser(newUser);
+            refreshUsers(userModel);
+        }
     }
 
     private void refreshUsers(DefaultTableModel model) {
@@ -212,7 +278,8 @@ public class FraudDetectionApp extends JFrame {
         
         panel.add(filterPanel, BorderLayout.NORTH);
 
-        String[] columnNames = {"ID", "User ID", "Type", "Time", "Severity", "Description"};
+        // Split Pane for Table and Details
+        String[] columnNames = {"ID", "User ID", "Severity"};
         alertModel = new DefaultTableModel(columnNames, 0) {
             @Override
             public boolean isCellEditable(int row, int column) { return false; }
@@ -224,7 +291,7 @@ public class FraudDetectionApp extends JFrame {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                Object val = table.getModel().getValueAt(row, 4);
+                Object val = table.getModel().getValueAt(row, 2);
                 String severity = (val != null) ? val.toString().toLowerCase() : "";
                 
                 if (!isSelected) {
@@ -239,25 +306,84 @@ public class FraudDetectionApp extends JFrame {
             }
         });
 
+        alertDetailsArea = new JTextArea(5, 20);
+        alertDetailsArea.setEditable(false);
+        alertDetailsArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
+        alertDetailsArea.setBorder(BorderFactory.createTitledBorder("Alert Details"));
+
+        table.getSelectionModel().addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting()) {
+                int selectedRow = table.getSelectedRow();
+                if (selectedRow != -1) {
+                    // Fetch full details from database or stored objects
+                    int alertId = (int) table.getValueAt(selectedRow, 0);
+                    updateAlertDetails(alertId);
+                }
+            }
+        });
+
+        JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, new JScrollPane(table), new JScrollPane(alertDetailsArea));
+        splitPane.setDividerLocation(400);
+        panel.add(splitPane, BorderLayout.CENTER);
+
         JButton refreshBtn = new JButton("Refresh Alerts");
         refreshBtn.addActionListener(e -> refreshAlerts(alertModel, severityFilter.getSelectedItem().toString()));
         severityFilter.addActionListener(e -> refreshAlerts(alertModel, severityFilter.getSelectedItem().toString()));
 
-        panel.add(new JScrollPane(table), BorderLayout.CENTER);
         panel.add(refreshBtn, BorderLayout.SOUTH);
 
         refreshAlerts(alertModel, "All");
         return panel;
     }
 
+    private void updateAlertDetails(int alertId) {
+        List<Alert> alerts = alertDAO.getAlertsBySeverity("All");
+        for (Alert a : alerts) {
+            if (a.getAlertId() == alertId) {
+                // Find user details
+                User user = null;
+                List<User> users = userDAO.getAllUsers();
+                for (User u : users) {
+                    if (u.getUserId() == a.getUserId()) {
+                        user = u;
+                        break;
+                    }
+                }
+
+                StringBuilder details = new StringBuilder();
+                details.append("=== ALERT INFORMATION ===\n");
+                details.append("Alert ID:    ").append(a.getAlertId()).append("\n");
+                details.append("Type:        ").append(a.getAlertType()).append("\n");
+                details.append("Time:        ").append(a.getAlertTime()).append("\n");
+                details.append("Severity:    ").append(a.getSeverity()).append("\n");
+                details.append("Description: ").append(a.getDescription()).append("\n\n");
+                
+                details.append("=== USER INFORMATION ===\n");
+                if (user != null) {
+                    details.append("User ID:     ").append(user.getUserId()).append("\n");
+                    details.append("Full Name:   ").append(user.getFullName()).append("\n");
+                    details.append("Country:     ").append(user.getCountry()).append("\n");
+                    details.append("User Status: ").append(user.getStatus()).append("\n");
+                    details.append("Signup Date: ").append(user.getSignupDate());
+                } else {
+                    details.append("User details not found (User ID: ").append(a.getUserId()).append(")");
+                }
+
+                alertDetailsArea.setText(details.toString());
+                alertDetailsArea.setCaretPosition(0); // Scroll to top
+                return;
+            }
+        }
+    }
+
     private void refreshAlerts(DefaultTableModel model, String severity) {
         if (model == null) return;
         model.setRowCount(0);
+        alertDetailsArea.setText(""); // Clear details on refresh
         List<Alert> alerts = alertDAO.getAlertsBySeverity(severity);
         for (Alert a : alerts) {
             model.addRow(new Object[]{
-                    a.getAlertId(), a.getUserId(), a.getAlertType(),
-                    a.getAlertTime(), a.getSeverity(), a.getDescription()
+                    a.getAlertId(), a.getUserId(), a.getSeverity()
             });
         }
     }

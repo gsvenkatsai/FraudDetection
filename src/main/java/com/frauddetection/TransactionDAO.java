@@ -31,4 +31,19 @@ public class TransactionDAO {
         }
         return transactions;
     }
+
+    public void insertTransaction(Transaction transaction) {
+        String query = "INSERT INTO Transactions (user_id, amount, transaction_time, merchant, status) VALUES (?, ?, ?, ?, ?)";
+        try (Connection conn = DatabaseConnection.getConnection();
+             java.sql.PreparedStatement pstmt = conn.prepareStatement(query)) {
+            pstmt.setInt(1, transaction.getUserId());
+            pstmt.setBigDecimal(2, transaction.getAmount());
+            pstmt.setTimestamp(3, transaction.getTransactionTime());
+            pstmt.setString(4, transaction.getMerchant());
+            pstmt.setString(5, transaction.getStatus());
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }

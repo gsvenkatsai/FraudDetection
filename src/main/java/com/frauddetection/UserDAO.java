@@ -30,4 +30,18 @@ public class UserDAO {
         }
         return users;
     }
+
+    public void insertUser(User user) {
+        String query = "INSERT INTO Users (full_name, country, status, signup_date) VALUES (?, ?, ?, ?)";
+        try (Connection conn = DatabaseConnection.getConnection();
+             java.sql.PreparedStatement pstmt = conn.prepareStatement(query)) {
+            pstmt.setString(1, user.getFullName());
+            pstmt.setString(2, user.getCountry());
+            pstmt.setString(3, user.getStatus());
+            pstmt.setTimestamp(4, user.getSignupDate());
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }
