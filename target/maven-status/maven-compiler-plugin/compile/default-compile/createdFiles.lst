@@ -1,10 +1,11 @@
-com/frauddetection/FraudDetectionApp$1.class
 com/frauddetection/Alert.class
 com/frauddetection/Transaction.class
-com/frauddetection/FraudDetectionApp$2.class
+com/frauddetection/servlet/AlertServlet.class
+com/frauddetection/servlet/TransactionServlet.class
 com/frauddetection/FraudEngine.class
-com/frauddetection/FraudDetectionApp.class
+com/frauddetection/servlet/DashboardServlet.class
 com/frauddetection/TransactionDAO.class
+com/frauddetection/servlet/UserServlet.class
 com/frauddetection/AlertDAO.class
 com/frauddetection/DatabaseConnection.class
 com/frauddetection/DatabaseInitializer.class
