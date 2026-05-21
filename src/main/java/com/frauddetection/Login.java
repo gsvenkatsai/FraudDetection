@@ -10,9 +10,11 @@ public class Login {
     private String ipAddress;
     private String country;
     private String deviceId;
+    private String deviceType;
+    private String os;
     private String status;
 
-    public Login(int loginId, int userId, String userName, Timestamp loginTime, String ipAddress, String country, String deviceId, String status) {
+    public Login(int loginId, int userId, String userName, Timestamp loginTime, String ipAddress, String country, String deviceId, String deviceType, String os, String status) {
         this.loginId = loginId;
         this.userId = userId;
         this.userName = userName;
@@ -20,6 +22,8 @@ public class Login {
         this.ipAddress = ipAddress;
         this.country = country;
         this.deviceId = deviceId;
+        this.deviceType = deviceType;
+        this.os = os;
         this.status = status;
     }
 
@@ -31,5 +35,7 @@ public class Login {
     public String getIpAddress() { return ipAddress; }
     public String getCountry() { return country; }
     public String getDeviceId() { return deviceId; }
+    public String getDeviceType() { return deviceType; }
+    public String getOs() { return os; }
     public String getStatus() { return status; }
 }

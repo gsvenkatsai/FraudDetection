@@ -11,9 +11,10 @@
                 <th>ID</th>
                 <th>User</th>
                 <th>Time</th>
-                <th>Country</th>
+                <th>Location</th>
                 <th>IP Address</th>
-                <th>Device ID</th>
+                <th>Device</th>
+                <th>Type / OS</th>
                 <th>Status</th>
             </tr>
         </thead>
@@ -26,6 +27,16 @@
                     <td>${login.country}</td>
                     <td>${login.ipAddress}</td>
                     <td><code>${login.deviceId}</code></td>
+                    <td>
+                        <c:choose>
+                            <c:when test="${not empty login.deviceType}">
+                                ${login.deviceType} / ${login.os}
+                            </c:when>
+                            <c:otherwise>
+                                <span class="text-muted">Unknown</span>
+                            </c:otherwise>
+                        </c:choose>
+                    </td>
                     <td>
                         <span class="badge ${login.status == 'success' ? 'bg-success' : 'bg-danger'}">
                             ${login.status}
