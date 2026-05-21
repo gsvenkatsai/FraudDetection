@@ -8,8 +8,13 @@
     <display-name>Fraud Detection System</display-name>
 
     <welcome-file-list>
+        <welcome-file>index.jsp</welcome-file>
         <welcome-file>dashboard</welcome-file>
     </welcome-file-list>
+
+    <listener>
+        <listener-class>com.frauddetection.AppInitializer</listener-class>
+    </listener>
 
     <servlet>
         <servlet-name>DashboardServlet</servlet-name>
@@ -18,6 +23,15 @@
     <servlet-mapping>
         <servlet-name>DashboardServlet</servlet-name>
         <url-pattern>/dashboard</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>LoginServlet</servlet-name>
+        <servlet-class>com.frauddetection.servlet.LoginServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>LoginServlet</servlet-name>
+        <url-pattern>/logins</url-pattern>
     </servlet-mapping>
 
     <servlet>

@@ -1,73 +1,74 @@
 # Fraud Detection System
 
-A SQL-driven fraud detection analytics system built with Java, JDBC, PostgreSQL, and Swing UI.
+A SQL-driven fraud detection analytics system built with Java, JDBC, PostgreSQL, and a Web UI (JSP/Servlets).
 
 ## Tech Stack
-- Java 17
-- PostgreSQL
-- JDBC
-- Maven
-- Swing UI
+- **Backend**: Java 17, JDBC, Maven
+- **Database**: PostgreSQL 14+
+- **Frontend**: JSP, Servlets, Vanilla CSS
+- **Infrastructure**: Docker, Docker Compose, Jetty (Embedded)
 
 ## Features
-- 6 fraud detection rules using Window Functions and CTEs
-- Real-time alert dashboard with color-coded severity levels (High/Medium/Low)
-- Context-rich alert descriptions (e.g. detailed calculations of spending averages or exact travel durations)
-- Rich User details including name mapping from the database
-- DAO pattern for clean separation of concerns
+- **Fraud Engine**: 6 advanced detection rules using SQL Window Functions and CTEs.
+- **Real-time Dashboard**: Visual summary of alert severity (High/Medium/Low).
+- **Security Logs**: Dedicated **Login History** and **Transaction** logs for audit trails.
+- **Context-Rich Alerts**: Detailed descriptions explaining exactly *why* an alert was fired.
+- **Zero-Setup Execution**: Automatic database schema creation and sample data seeding.
 
 ## Fraud Detection Rules
-1. Spending Spike — amount > 3x user's 30-day rolling average
-2. High Frequency — 5+ transactions within 10 minutes
-3. Impossible Travel — same user in 2 countries within 1 hour
-4. New Device — transaction from device first seen within 24 hours
-5. Night Activity — transactions between 1AM–4AM
-6. Failed Login Cluster — 3+ failed logins within 5 minutes
+1. **Spending Spike** — amount > 3x user's 30-day rolling average.
+2. **High Frequency** — 5+ transactions within 10 minutes.
+3. **Impossible Travel** — same user in 2 countries within 1 hour.
+4. **New Device** — transaction from device first seen within 24 hours.
+5. **Night Activity** — transactions between 1AM–4AM.
+6. **Failed Login Cluster** — 3+ failed logins within 5 minutes.
 
-## Setup
-1. Create PostgreSQL database: `frauddetection`
-2. Update `src/main/resources/db.properties` with your credentials
-3. Run `mvn compile`
-4. Launch `FraudDetectionApp` and click "Initialize/Reset Database"
-5. Click "Run Fraud Detection Rules"
+---
 
-## Prerequisites
-- Java 17+
-- PostgreSQL 14+
-- Maven 3.8+
+## How to Run (Recommended: Docker)
 
-## Steps to Run
+The easiest way to run the project. No need to install Java, Maven, or PostgreSQL locally.
 
-### 1. Clone the repo
-```bash
-git clone https://github.com/gsvenkatsai/FraudDetection.git
-cd FraudDetection
-```
+1. **Start the system**:
+   ```bash
+   docker-compose up --build
+   ```
+2. **Access the Dashboard**:
+   Go to [http://localhost:8080](http://localhost:8080)
 
-### 2. Create the database
-```bash
-sudo -u postgres psql
-```
-```sql
-CREATE DATABASE frauddetection;
-\q
-```
+*Note: The database is automatically initialized and seeded with sample data on the first run.*
 
-### 3. Configure credentials
-Edit `src/main/resources/db.properties`:
+---
+
+## Manual Execution (Local Environment)
+
+If you prefer to run it without Docker:
+
+### 1. Prerequisites
+- Java 17+, Maven 3.8+, PostgreSQL 14+
+
+### 2. Configure Database
+Create a database named `frauddetection` and update `src/main/resources/db.properties`:
 ```properties
 db.url=jdbc:postgresql://localhost:5432/frauddetection
-db.username=postgres
-db.password=yourpassword
+db.user=your_username
+db.password=your_password
 ```
 
-### 4. Build and run
+### 3. Initialize & Run
 ```bash
-mvn compile
-mvn exec:java -Dexec.mainClass="com.frauddetection.FraudDetectionApp"
-```
+# Seed the database
+mvn compile exec:java -Dexec.mainClass="com.frauddetection.DatabaseInitializer"
 
-### 5. Initialize data
-- Click **"Initialize/Reset Database"** button
-- Click **"Run Fraud Detection Rules"**
-- Go to **Alerts tab** to see results
+# Start the server
+mvn jetty:run
+```
+Access at [http://localhost:8080](http://localhost:8080).
+
+---
+
+## Project Structure
+- `src/main/java/com/frauddetection`: Core logic, DAOs, and Database configuration.
+- `src/main/java/com/frauddetection/servlet`: Controllers for handling web requests.
+- `src/main/webapp/WEB-INF/jsp`: UI templates (Views).
+- `docker-compose.yml`: Orchestration for App and Database.

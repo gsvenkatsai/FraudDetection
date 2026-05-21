@@ -31,6 +31,9 @@
         .error { background: #f2dede; color: #a94442; padding: 1rem; border-radius: 4px; margin-bottom: 1rem; }
         .detail-view { background: #fffbe6; padding: 1.5rem; border: 1px solid #ffe58f; border-radius: 8px; margin-top: 2rem; }
         pre { background: #eee; padding: 1rem; }
+        .severity-high { background-color: #ffecec !important; }
+        .severity-medium { background-color: #fffce6 !important; }
+        .severity-low { background-color: #f6ffed !important; }
     </style>
 </head>
 <body>
@@ -40,6 +43,7 @@
     <nav>
         <a href="dashboard">Dashboard</a>
         <a href="users">Users</a>
+        <a href="logins">Logins</a>
         <a href="transactions">Transactions</a>
         <a href="alerts">Alerts</a>
     </nav>

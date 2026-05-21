@@ -23,10 +23,14 @@ public class DatabaseConnection {
     }
 
     public static Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(
-            properties.getProperty("db.url"),
-            properties.getProperty("db.user"),
-            properties.getProperty("db.password")
-        );
+        String url = System.getenv("DB_URL");
+        String user = System.getenv("DB_USER");
+        String pass = System.getenv("DB_PASSWORD");
+
+        if (url == null) url = properties.getProperty("db.url");
+        if (user == null) user = properties.getProperty("db.user");
+        if (pass == null) pass = properties.getProperty("db.password");
+
+        return DriverManager.getConnection(url, user, pass);
     }
 }
